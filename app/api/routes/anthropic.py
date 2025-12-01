@@ -10,7 +10,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import StreamingResponse, JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps_flexible import get_user_flexible
+from app.api.deps_flexible import get_user_flexible_with_x_api_key
 from app.api.deps import get_plugin_api_service, get_db_session, get_redis
 from app.models.user import User
 from app.services.plugin_api_service import PluginAPIService
@@ -62,16 +62,17 @@ def get_kiro_service(
 async def create_message(
     request: AnthropicMessagesRequest,
     raw_request: Request,
-    current_user: User = Depends(get_user_flexible),
+    current_user: User = Depends(get_user_flexible_with_x_api_key),
     antigravity_service: PluginAPIService = Depends(get_plugin_api_service),
     kiro_service: KiroService = Depends(get_kiro_service)
 ):
     """
     创建消息 (Anthropic Messages API兼容)
     
-    支持两种认证方式：
-    1. API key认证 - 用于程序调用，根据API key的config_type自动选择配置
-    2. JWT token认证 - 用于网页聊天，默认使用Antigravity配置
+    支持三种认证方式：
+    1. X-Api-Key 标头 - Anthropic 官方认证方式
+    2. Authorization Bearer API key - 用于程序调用，根据API key的config_type自动选择配置
+    3. Authorization Bearer JWT token - 用于网页聊天，默认使用Antigravity配置
     
     **配置选择:**
     - 使用API key时，根据创建时选择的config_type（antigravity/kiro）自动路由
@@ -218,7 +219,7 @@ async def create_message(
 )
 async def count_tokens(
     request: AnthropicMessagesRequest,
-    current_user: User = Depends(get_user_flexible)
+    current_user: User = Depends(get_user_flexible_with_x_api_key)
 ):
     """
     计算消息的token数量
