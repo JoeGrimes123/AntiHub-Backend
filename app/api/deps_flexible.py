@@ -203,12 +203,10 @@ async def get_user_flexible_with_x_api_key(
     """
     # 优先使用 X-Api-Key 标头
     if x_api_key_user:
-        logger.debug(f"[Auth] 使用 X-Api-Key 认证成功, user_id={x_api_key_user.id}")
         return x_api_key_user
     
     # 如果没有 X-Api-Key，检查 Authorization 标头
     if not credentials:
-        logger.warning("[Auth] 认证失败: 未提供任何认证凭证")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="需要提供认证凭证（X-Api-Key 标头或 Authorization Bearer token）",
@@ -264,15 +262,12 @@ async def get_user_flexible_with_x_api_key(
             return user
         else:
             # JWT token 认证
-            logger.debug(f"[Auth] 尝试 JWT token 认证")
             user = await auth_service.get_current_user(token)
-            logger.debug(f"[Auth] JWT token 认证成功, user_id={user.id}")
             return user
             
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"[Auth] 认证失败: {str(e)}")
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"认证失败: {str(e)}",

@@ -168,10 +168,6 @@ def create_app() -> FastAPI:
                 msg = error.get("msg", "Unknown error")
                 error_messages.append(f"{loc}: {msg}")
             
-            logging.getLogger(__name__).error(
-                f"[Anthropic API] 请求验证失败: path={request.url.path}, errors={error_details}"
-            )
-            
             return JSONResponse(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 content={

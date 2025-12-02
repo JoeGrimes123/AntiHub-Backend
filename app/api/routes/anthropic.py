@@ -84,9 +84,6 @@ async def create_message(
     - 内部转换为OpenAI格式调用plug-in-api
     - 将响应转换回Anthropic格式返回
     """
-    # 记录请求信息用于调试
-    logger.info(f"[Anthropic API] 收到请求: model={request.model}, stream={request.stream}, user_id={current_user.id}")
-    
     try:
         # 生成请求ID
         request_id = uuid.uuid4().hex[:24]
@@ -239,11 +236,9 @@ async def count_tokens(
             raise ValueError("缺少必需字段: model")
         if "messages" not in body:
             raise ValueError("缺少必需字段: messages")
-        
         model = body.get("model")
         messages = body.get("messages", [])
         system = body.get("system")
-        logger.info(f"[Anthropic API] count_tokens 请求: model={model}, messages_count={len(messages)}")
         
         # 简单估算：将所有文本内容拼接后按字符数估算
         # 实际应该使用tokenizer，这里只是提供一个近似值
