@@ -1,117 +1,117 @@
-# 共享账号管理系统
+# Shared Account Management System
 
-基于 FastAPI 的共享账号管理系统，集成 Plug-in API 功能，支持传统用户名密码登录和 OAuth SSO 单点登录，提供完整的 AI 聊天服务和配额管理。
+A FastAPI-based shared account management system with integrated Plug-in API functionality, supporting traditional username/password login and OAuth SSO single sign-on, providing complete AI chat services and quota management.
 
-## 功能特性
+## Features
 
-### ✅ 已实现功能
+### ✅ Implemented Features
 
-- **用户认证**
-  - 传统用户名密码登录
-  - OAuth 2.0 SSO 单点登录（支持 Linux.do、GitHub）
-  - JWT 令牌认证
-  - **无感刷新机制**（Refresh Token）
-  - 会话管理
-  - 令牌黑名单机制
-  - Token 轮换安全机制
+- **User Authentication**
+  - Traditional username/password login
+  - OAuth 2.0 SSO single sign-on (supports Linux.do, GitHub)
+  - JWT token authentication
+  - **Seamless refresh mechanism** (Refresh Token)
+  - Session management
+  - Token blacklist mechanism
+  - Token rotation security mechanism
 
-- **用户管理**
-  - 用户信息存储(PostgreSQL)
-  - OAuth 令牌管理
-  - 用户状态管理(激活/禁用/禁言)
-  - 信任等级系统
+- **User Management**
+  - User information storage (PostgreSQL)
+  - OAuth token management
+  - User status management (active/disabled/silenced)
+  - Trust level system
 
-- **Plug-in API 集成**
-  - 自动账号创建：用户注册时自动创建 Plug-in API 账号
-  - API 密钥安全存储：使用 Fernet 加密算法安全存储
-  - 代理请求：所有 Plug-in API 请求通过后端代理
-  - OpenAI 兼容接口：支持标准的 OpenAI API 格式
-  - 完整功能支持：账号管理、配额管理、聊天补全等
+- **Plug-in API Integration**
+  - Automatic account creation: Automatically creates Plug-in API accounts upon user registration
+  - API key secure storage: Uses Fernet encryption algorithm for secure storage
+  - Proxy requests: All Plug-in API requests are proxied through the backend
+  - OpenAI compatible interface: Supports standard OpenAI API format
+  - Complete feature support: Account management, quota management, chat completions, etc.
 
-- **AI 聊天服务**
-  - OpenAI 兼容的聊天补全 API
-  - 支持流式和非流式输出
-  - 多模型支持（Gemini 等）
-  - 智能 Cookie 选择和轮换
+- **AI Chat Service**
+  - OpenAI compatible chat completion API
+  - Supports streaming and non-streaming output
+  - Multi-model support (Gemini, etc.)
+  - Intelligent Cookie selection and rotation
 
-- **配额管理系统**
-  - 用户共享配额池
-  - 自动配额恢复机制
-  - 配额消耗追踪和统计
-  - 专属/共享 Cookie 优先级设置
+- **Quota Management System**
+  - User shared quota pool
+  - Automatic quota recovery mechanism
+  - Quota consumption tracking and statistics
+  - Dedicated/shared Cookie priority settings
 
-- **安全特性**
-  - bcrypt 密码哈希(rounds=12)
-  - JWT Access Token (HS256, 默认24小时有效期)
-  - JWT Refresh Token (默认7天有效期)
-  - OAuth state 验证(防止 CSRF 攻击)
-  - Token 自动轮换机制
-  - API 密钥加密存储
+- **Security Features**
+  - bcrypt password hashing (rounds=12)
+  - JWT Access Token (HS256, default 24-hour validity)
+  - JWT Refresh Token (default 7-day validity)
+  - OAuth state validation (prevents CSRF attacks)
+  - Token auto-rotation mechanism
+  - API key encryption storage
 
-- **缓存系统**
-  - Redis 会话存储
-  - 令牌黑名单
-  - Refresh Token 存储和管理
-  - OAuth state 临时存储
+- **Cache System**
+  - Redis session storage
+  - Token blacklist
+  - Refresh Token storage and management
+  - OAuth state temporary storage
 
-## 技术栈
+## Technology Stack
 
-- **Web 框架**: FastAPI 0.104+
-- **数据库**: PostgreSQL + SQLAlchemy 2.0 (异步)
-- **缓存**: Redis
-- **认证**: PyJWT + Passlib
-- **HTTP 客户端**: httpx
-- **数据库迁移**: Alembic
-- **数据验证**: Pydantic
+- **Web Framework**: FastAPI 0.104+
+- **Database**: PostgreSQL + SQLAlchemy 2.0 (async)
+- **Cache**: Redis
+- **Authentication**: PyJWT + Passlib
+- **HTTP Client**: httpx
+- **Database Migration**: Alembic
+- **Data Validation**: Pydantic
 
-## 快速开始
+## Quick Start
 
-### 1. 环境要求
+### 1. Requirements
 
 - Python 3.10+
 - PostgreSQL 12+
 - Redis 6+
-- Plug-in API 服务（可选，用于 AI 聊天功能）
+- Plug-in API service (optional, for AI chat functionality)
 
-### 2. 安装依赖
+### 2. Install Dependencies
 
 ```bash
-# 使用 uv 
+# Using uv
 uv sync
 ```
 
-### 3. 配置环境变量
+### 3. Configure Environment Variables
 
-复制 `.env.example` 到 `.env` 并配置:
+Copy `.env.example` to `.env` and configure:
 
 ```bash
 cp .env.example .env
 ```
 
-编辑 `.env` 文件,配置以下必需项:
+Edit the `.env` file and configure the following required items:
 
 ```bash
-# 应用配置
+# Application configuration
 APP_ENV=development
 LOG_LEVEL=INFO
 
-# 数据库配置
+# Database configuration
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/shared_accounts
 
-# Redis 配置
+# Redis configuration
 REDIS_URL=redis://localhost:6379/0
-# 或带密码: redis://:password@localhost:6379/0
+# Or with password: redis://:password@localhost:6379/0
 
-# JWT 配置
+# JWT configuration
 JWT_SECRET_KEY=your-secret-key-change-this-in-production
 JWT_ALGORITHM=HS256
 JWT_EXPIRE_HOURS=24
 
-# Refresh Token 配置
+# Refresh Token configuration
 REFRESH_TOKEN_EXPIRE_DAYS=7
-# REFRESH_TOKEN_SECRET_KEY=your-refresh-token-secret-key  # 可选，默认使用 JWT_SECRET_KEY
+# REFRESH_TOKEN_SECRET_KEY=your-refresh-token-secret-key  # Optional, defaults to JWT_SECRET_KEY
 
-# OAuth 配置（Linux.do）
+# OAuth configuration (Linux.do)
 OAUTH_CLIENT_ID=your-oauth-client-id
 OAUTH_CLIENT_SECRET=your-oauth-client-secret
 OAUTH_REDIRECT_URI=http://localhost:8008/api/auth/sso/callback
@@ -119,128 +119,128 @@ OAUTH_AUTHORIZATION_ENDPOINT=https://connect.linux.do/oauth2/authorize
 OAUTH_TOKEN_ENDPOINT=https://connect.linux.do/oauth2/token
 OAUTH_USER_INFO_ENDPOINT=https://connect.linux.do/api/user
 
-# GitHub OAuth 配置
+# GitHub OAuth configuration
 GITHUB_CLIENT_ID=your-github-client-id
 GITHUB_CLIENT_SECRET=your-github-client-secret
 GITHUB_REDIRECT_URI=http://localhost:3000/api/auth/github/callback
 
-# Plug-in API 配置（可选）
+# Plug-in API configuration (optional)
 PLUGIN_API_BASE_URL=http://localhost:8045
 PLUGIN_API_ADMIN_KEY=sk-admin-your-admin-key-here
 PLUGIN_API_ENCRYPTION_KEY=your-encryption-key-here-min-32-chars
 ```
 
-**重要**：`PLUGIN_API_ENCRYPTION_KEY` 必须是一个有效的 Fernet 密钥（32字节的URL安全base64编码）。可以使用以下 Python 代码生成：
+**Important**: `PLUGIN_API_ENCRYPTION_KEY` must be a valid Fernet key (32-byte URL-safe base64 encoded). You can generate one using the following Python code:
 
 ```python
 from cryptography.fernet import Fernet
 print(Fernet.generate_key().decode())
 ```
 
-### 4. 数据库迁移
+### 4. Database Migration
 
 ```bash
-# 运行数据库迁移
+# Run database migration
 uv run alembic upgrade head
 ```
 
-### 5. 启动服务
+### 5. Start the Service
 
 ```bash
-# 使用启动脚本（推荐）
+# Using the startup script (recommended)
 chmod +x run.sh
 ./run.sh
 
-# 或直接使用 uvicorn
+# Or directly using uvicorn
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8008 --reload
 
-# 或使用 Python
+# Or using Python
 uv run python app/main.py
 ```
 
-服务将在 http://localhost:8008 启动
+The service will start at http://localhost:8008
 
-## API 文档
+## API Documentation
 
-启动服务后访问:
+After starting the service, visit:
 
 - **Swagger UI**: http://localhost:8008/api/docs
 - **ReDoc**: http://localhost:8008/api/redoc
 - **OpenAPI JSON**: http://localhost:8008/api/openapi.json
 
-**注意**：生产环境中 API 文档将被禁用。
+**Note**: API documentation is disabled in production environment.
 
-## API 端点
+## API Endpoints
 
-### 认证相关
+### Authentication
 
-| 方法 | 路径 | 描述 |
-|------|------|------|
-| POST | `/api/auth/login` | 用户名密码登录 |
-| POST | `/api/auth/refresh` | 刷新访问令牌（无感刷新） |
-| GET | `/api/auth/sso/initiate` | 发起 OAuth SSO 登录 |
-| GET | `/api/auth/sso/callback` | OAuth 回调处理 |
-| GET | `/api/auth/github/login` | 发起 GitHub OAuth 登录 |
-| POST | `/api/auth/github/callback` | GitHub OAuth 回调处理 |
-| POST | `/api/auth/logout` | 用户登出 |
-| POST | `/api/auth/logout-all` | 登出所有设备 |
-| GET | `/api/auth/me` | 获取当前用户信息 |
-| GET | `/api/auth/check-username` | 检查用户名是否存在 |
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/login` | Username/password login |
+| POST | `/api/auth/refresh` | Refresh access token (seamless refresh) |
+| GET | `/api/auth/sso/initiate` | Initiate OAuth SSO login |
+| GET | `/api/auth/sso/callback` | OAuth callback handler |
+| GET | `/api/auth/github/login` | Initiate GitHub OAuth login |
+| POST | `/api/auth/github/callback` | GitHub OAuth callback handler |
+| POST | `/api/auth/logout` | User logout |
+| POST | `/api/auth/logout-all` | Logout from all devices |
+| GET | `/api/auth/me` | Get current user info |
+| GET | `/api/auth/check-username` | Check if username exists |
 
-### 健康检查
+### Health Check
 
-| 方法 | 路径 | 描述 |
-|------|------|------|
-| GET | `/api/health` | 系统健康状态检查 |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/health` | System health status check |
 
-### API 密钥管理
+### API Key Management
 
-| 方法 | 路径 | 描述 |
-|------|------|------|
-| GET | `/api/api-keys` | 获取用户的 API 密钥列表 |
-| POST | `/api/api-keys` | 创建新的 API 密钥 |
-| DELETE | `/api/api-keys/{key_id}` | 删除指定的 API 密钥 |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/api-keys` | Get user's API key list |
+| POST | `/api/api-keys` | Create new API key |
+| DELETE | `/api/api-keys/{key_id}` | Delete specified API key |
 
-### Plug-in API 代理（需要配置 Plug-in API 服务）
+### Plug-in API Proxy (requires Plug-in API service configuration)
 
-| 方法 | 路径 | 描述 |
-|------|------|------|
-| GET | `/api/plugin-api/accounts` | 获取账号列表 |
-| POST | `/api/plugin-api/oauth/authorize` | 获取 OAuth 授权 URL |
-| GET | `/api/plugin-api/quotas/user` | 获取用户配额信息 |
-| POST | `/api/plugin-api/chat/completions` | 聊天补全（OpenAI 兼容） |
-| GET | `/api/plugin-api/models` | 获取可用模型列表 |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/plugin-api/accounts` | Get account list |
+| POST | `/api/plugin-api/oauth/authorize` | Get OAuth authorization URL |
+| GET | `/api/plugin-api/quotas/user` | Get user quota information |
+| POST | `/api/plugin-api/chat/completions` | Chat completion (OpenAI compatible) |
+| GET | `/api/plugin-api/models` | Get available model list |
 
-### OpenAI 兼容接口
+### OpenAI Compatible Interface
 
-| 方法 | 路径 | 描述 |
-|------|------|------|
-| GET | `/v1/models` | 获取模型列表 |
-| POST | `/v1/chat/completions` | 聊天补全（流式/非流式） |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v1/models` | Get model list |
+| POST | `/v1/chat/completions` | Chat completion (streaming/non-streaming) |
 
-### 使用统计
+### Usage Statistics
 
-| 方法 | 路径 | 描述 |
-|------|------|------|
-| GET | `/api/usage/stats` | 获取使用统计信息 |
-| GET | `/api/usage/logs` | 获取使用日志 |
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/usage/stats` | Get usage statistics |
+| GET | `/api/usage/logs` | Get usage logs |
 
-## 无感刷新机制
+## Seamless Refresh Mechanism
 
-系统实现了完整的无感刷新（Silent Refresh）机制，让用户无需频繁重新登录。
+The system implements a complete seamless refresh (Silent Refresh) mechanism, allowing users to avoid frequent re-logins.
 
-### 工作原理
+### How It Works
 
-1. **登录时**：用户登录成功后，系统返回两个令牌：
-   - `access_token`：短期有效（默认24小时），用于API请求认证
-   - `refresh_token`：长期有效（默认7天），用于刷新 access_token
+1. **During Login**: After successful login, the system returns two tokens:
+   - `access_token`: Short-term valid (default 24 hours), used for API request authentication
+   - `refresh_token`: Long-term valid (default 7 days), used to refresh access_token
 
-2. **API 请求**：使用 `access_token` 进行认证
+2. **API Requests**: Use `access_token` for authentication
    ```
    Authorization: Bearer <access_token>
    ```
 
-3. **Token 刷新**：当 `access_token` 即将过期或已过期时，使用 `refresh_token` 获取新的令牌对
+3. **Token Refresh**: When `access_token` is about to expire or has expired, use `refresh_token` to get a new token pair
    ```bash
    POST /api/auth/refresh
    {
@@ -248,36 +248,36 @@ uv run python app/main.py
    }
    ```
 
-4. **Token 轮换**：每次刷新后，旧的 `refresh_token` 失效，返回新的令牌对（安全机制）
+4. **Token Rotation**: After each refresh, the old `refresh_token` becomes invalid, and a new token pair is returned (security mechanism)
 
-### 前端实现建议
+### Frontend Implementation Suggestions
 
 ```javascript
-// 示例：Axios 拦截器实现无感刷新
+// Example: Axios interceptor implementing seamless refresh
 axios.interceptors.response.use(
   response => response,
   async error => {
     const originalRequest = error.config;
     
-    // 如果是 401 错误且不是刷新请求本身
+    // If it's a 401 error and not the refresh request itself
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       
       try {
-        // 使用 refresh_token 获取新令牌
+        // Use refresh_token to get new tokens
         const { data } = await axios.post('/api/auth/refresh', {
           refresh_token: localStorage.getItem('refresh_token')
         });
         
-        // 保存新令牌
+        // Save new tokens
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
         
-        // 重试原请求
+        // Retry original request
         originalRequest.headers.Authorization = `Bearer ${data.access_token}`;
         return axios(originalRequest);
       } catch (refreshError) {
-        // 刷新失败，需要重新登录
+        // Refresh failed, need to login again
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
         window.location.href = '/login';
@@ -290,7 +290,7 @@ axios.interceptors.response.use(
 );
 ```
 
-### 登录响应示例
+### Login Response Example
 
 ```json
 {
@@ -309,7 +309,7 @@ axios.interceptors.response.use(
 }
 ```
 
-### 刷新响应示例
+### Refresh Response Example
 
 ```json
 {
@@ -320,9 +320,9 @@ axios.interceptors.response.use(
 }
 ```
 
-## 使用示例
+## Usage Examples
 
-### 传统登录
+### Traditional Login
 
 ```bash
 curl -X POST "http://localhost:8008/api/auth/login" \
@@ -333,7 +333,7 @@ curl -X POST "http://localhost:8008/api/auth/login" \
   }'
 ```
 
-### 刷新令牌
+### Refresh Token
 
 ```bash
 curl -X POST "http://localhost:8008/api/auth/refresh" \
@@ -343,24 +343,24 @@ curl -X POST "http://localhost:8008/api/auth/refresh" \
   }'
 ```
 
-### OAuth SSO 登录
+### OAuth SSO Login
 
 ```bash
-# 1. 获取授权 URL
+# 1. Get authorization URL
 curl "http://localhost:8008/api/auth/sso/initiate"
 
-# 2. 用户在浏览器中访问返回的 authorization_url
-# 3. 授权后会重定向到 callback URL 并自动完成登录
+# 2. User visits the returned authorization_url in browser
+# 3. After authorization, will redirect to callback URL and automatically complete login
 ```
 
-### GitHub OAuth 登录
+### GitHub OAuth Login
 
 ```bash
-# 1. 获取 GitHub 授权 URL
+# 1. Get GitHub authorization URL
 curl "http://localhost:8008/api/auth/github/login"
 
-# 2. 用户在浏览器中访问返回的 authorization_url
-# 3. 授权后前端调用 callback 接口完成登录
+# 2. User visits the returned authorization_url in browser
+# 3. After authorization, frontend calls callback endpoint to complete login
 curl -X POST "http://localhost:8008/api/auth/github/callback" \
   -H "Content-Type: application/json" \
   -d '{
@@ -369,17 +369,17 @@ curl -X POST "http://localhost:8008/api/auth/github/callback" \
   }'
 ```
 
-### 获取当前用户信息
+### Get Current User Info
 
 ```bash
 curl "http://localhost:8008/api/auth/me" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 登出
+### Logout
 
 ```bash
-# 登出当前设备
+# Logout current device
 curl -X POST "http://localhost:8008/api/auth/logout" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
@@ -387,197 +387,197 @@ curl -X POST "http://localhost:8008/api/auth/logout" \
     "refresh_token": "YOUR_REFRESH_TOKEN"
   }'
 
-# 登出所有设备
+# Logout all devices
 curl -X POST "http://localhost:8008/api/auth/logout-all" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-### 创建 API 密钥
+### Create API Key
 
 ```bash
 curl -X POST "http://localhost:8008/api/api-keys" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "我的API密钥",
-    "description": "用于测试的密钥"
+    "name": "My API Key",
+    "description": "Key for testing"
   }'
 ```
 
-### AI 聊天（需要配置 Plug-in API）
+### AI Chat (requires Plug-in API configuration)
 
 ```bash
-# 流式聊天
+# Streaming chat
 curl -X POST "http://localhost:8008/api/plugin-api/chat/completions" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gemini-3-pro-high",
     "messages": [
-      {"role": "user", "content": "你好，请介绍一下你自己"}
+      {"role": "user", "content": "Hello, please introduce yourself"}
     ],
     "stream": true
   }'
 
-# OpenAI 兼容格式
+# OpenAI compatible format
 curl -X POST "http://localhost:8008/v1/chat/completions" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gemini-3-pro-high",
     "messages": [
-      {"role": "user", "content": "你好，请介绍一下你自己"}
+      {"role": "user", "content": "Hello, please introduce yourself"}
     ],
     "stream": false
   }'
 ```
 
-### 获取配额信息
+### Get Quota Information
 
 ```bash
 curl "http://localhost:8008/api/plugin-api/quotas/user" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
-## 项目结构
+## Project Structure
 
 ```
 antigv-backend/
-├── alembic/                      # 数据库迁移脚本
-│   ├── versions/                 # 迁移版本文件
-│   ├── env.py                    # Alembic 环境配置
-│   └── script.py.mako            # 迁移脚本模板
+├── alembic/                      # Database migration scripts
+│   ├── versions/                 # Migration version files
+│   ├── env.py                    # Alembic environment configuration
+│   └── script.py.mako            # Migration script template
 ├── app/
-│   ├── api/                      # API 路由
-│   │   ├── deps.py               # 依赖注入
-│   │   ├── deps_flexible.py      # 灵活依赖注入
-│   │   └── routes/               # 路由端点
-│   │       ├── auth.py           # 认证路由
-│   │       ├── health.py         # 健康检查
-│   │       ├── plugin_api.py     # Plug-in API 代理
-│   │       ├── api_keys.py       # API 密钥管理
-│   │       ├── usage.py          # 使用统计
-│   │       └── v1.py             # OpenAI 兼容接口
-│   ├── cache/                    # Redis 缓存
-│   │   └── redis_client.py       # Redis 客户端
-│   ├── core/                     # 核心模块
-│   │   ├── config.py             # 配置管理
-│   │   ├── security.py           # 安全功能
-│   │   └── exceptions.py         # 异常定义
-│   ├── db/                       # 数据库
-│   │   ├── base.py               # Base 类
-│   │   └── session.py            # 会话管理
-│   ├── models/                   # 数据模型
-│   │   ├── user.py               # 用户模型
-│   │   ├── api_key.py            # API 密钥模型
-│   │   ├── oauth_token.py        # OAuth 令牌模型
-│   │   ├── plugin_api_key.py     # Plug-in API 密钥模型
-│   │   └── usage_log.py          # 使用日志模型
-│   ├── repositories/             # 数据仓储层
-│   │   ├── user_repository.py    # 用户仓储
-│   │   ├── api_key_repository.py # API 密钥仓储
-│   │   ├── oauth_token_repository.py # OAuth 令牌仓储
-│   │   └── plugin_api_key_repository.py # Plug-in API 密钥仓储
+│   ├── api/                      # API routes
+│   │   ├── deps.py               # Dependency injection
+│   │   ├── deps_flexible.py      # Flexible dependency injection
+│   │   └── routes/               # Route endpoints
+│   │       ├── auth.py           # Authentication routes
+│   │       ├── health.py         # Health check
+│   │       ├── plugin_api.py     # Plug-in API proxy
+│   │       ├── api_keys.py       # API key management
+│   │       ├── usage.py          # Usage statistics
+│   │       └── v1.py             # OpenAI compatible interface
+│   ├── cache/                    # Redis cache
+│   │   └── redis_client.py       # Redis client
+│   ├── core/                     # Core modules
+│   │   ├── config.py             # Configuration management
+│   │   ├── security.py           # Security features
+│   │   └── exceptions.py         # Exception definitions
+│   ├── db/                       # Database
+│   │   ├── base.py               # Base classes
+│   │   └── session.py            # Session management
+│   ├── models/                   # Data models
+│   │   ├── user.py               # User model
+│   │   ├── api_key.py            # API key model
+│   │   ├── oauth_token.py        # OAuth token model
+│   │   ├── plugin_api_key.py     # Plug-in API key model
+│   │   └── usage_log.py          # Usage log model
+│   ├── repositories/             # Data repository layer
+│   │   ├── user_repository.py    # User repository
+│   │   ├── api_key_repository.py # API key repository
+│   │   ├── oauth_token_repository.py # OAuth token repository
+│   │   └── plugin_api_key_repository.py # Plug-in API key repository
 │   ├── schemas/                  # Pydantic Schemas
-│   │   ├── user.py               # 用户 Schema
-│   │   ├── auth.py               # 认证 Schema
-│   │   ├── api_key.py            # API 密钥 Schema
-│   │   ├── token.py              # 令牌 Schema
+│   │   ├── user.py               # User Schema
+│   │   ├── auth.py               # Authentication Schema
+│   │   ├── api_key.py            # API key Schema
+│   │   ├── token.py              # Token Schema
 │   │   └── plugin_api.py         # Plug-in API Schema
-│   ├── services/                 # 业务逻辑层
-│   │   ├── auth_service.py       # 认证服务
-│   │   ├── user_service.py       # 用户服务
-│   │   ├── oauth_service.py      # OAuth 服务
-│   │   ├── github_oauth_service.py # GitHub OAuth 服务
-│   │   └── plugin_api_service.py # Plug-in API 服务
-│   ├── utils/                    # 工具模块
-│   │   └── encryption.py         # 加密工具
-│   └── main.py                   # 应用入口
-├── .env.example                  # 环境变量示例
-├── .gitignore                    # Git 忽略文件
-├── .python-version               # Python 版本
-├── alembic.ini                   # Alembic 配置
-├── pyproject.toml                # 项目配置和依赖
-├── uv.lock                       # uv 锁定文件
-├── run.sh                        # 启动脚本
-├── generate_encryption_key.py    # 加密密钥生成工具
-├── PLUGIN_API_INTEGRATION.md     # Plug-in API 集成文档
-├── plug-in-API.md               # Plug-in API 使用文档
-└── README.md                     # 项目文档
+│   ├── services/                 # Business logic layer
+│   │   ├── auth_service.py       # Authentication service
+│   │   ├── user_service.py       # User service
+│   │   ├── oauth_service.py      # OAuth service
+│   │   ├── github_oauth_service.py # GitHub OAuth service
+│   │   └── plugin_api_service.py # Plug-in API service
+│   ├── utils/                    # Utility modules
+│   │   └── encryption.py         # Encryption utilities
+│   └── main.py                   # Application entry point
+├── .env.example                  # Environment variables example
+├── .gitignore                    # Git ignore file
+├── .python-version               # Python version
+├── alembic.ini                   # Alembic configuration
+├── pyproject.toml                # Project configuration and dependencies
+├── uv.lock                       # uv lock file
+├── run.sh                        # Startup script
+├── generate_encryption_key.py    # Encryption key generation tool
+├── PLUGIN_API_INTEGRATION.md     # Plug-in API integration documentation
+├── plug-in-API.md               # Plug-in API usage documentation
+└── README.md                     # Project documentation
 ```
 
-## 开发指南
+## Development Guide
 
-### 数据库迁移
+### Database Migration
 
 ```bash
-# 创建新的迁移
-uv run alembic revision --autogenerate -m "描述信息"
+# Create new migration
+uv run alembic revision --autogenerate -m "Description"
 
-# 应用迁移
+# Apply migration
 uv run alembic upgrade head
 
-# 回滚迁移
+# Rollback migration
 uv run alembic downgrade -1
 
-# 查看迁移历史
+# View migration history
 uv run alembic history
 
-# 查看当前版本
+# View current version
 uv run alembic current
 ```
 
-### 代码风格
+### Code Style
 
-项目使用类型注解和文档字符串，请保持一致的代码风格：
+The project uses type annotations and docstrings. Please maintain consistent code style:
 
-- 使用 Python 3.10+ 类型注解
-- 所有公共函数和类都需要文档字符串
-- 遵循 PEP 8 代码规范
-- 使用异步编程模式（async/await）
+- Use Python 3.10+ type annotations
+- All public functions and classes require docstrings
+- Follow PEP 8 code standards
+- Use async programming patterns (async/await)
 
-### 环境配置
+### Environment Configuration
 
-#### 开发环境
+#### Development Environment
 ```bash
 APP_ENV=development
 LOG_LEVEL=DEBUG
 ```
 
-#### 生产环境
+#### Production Environment
 ```bash
 APP_ENV=production
 LOG_LEVEL=INFO
-# 确保使用强密码和安全的 JWT 密钥
-# 建议为 Refresh Token 使用独立的密钥
-# 配置适当的 CORS 源
-# 禁用 API 文档
+# Ensure strong passwords and secure JWT keys
+# Recommend using independent keys for Refresh Token
+# Configure appropriate CORS origins
+# Disable API documentation
 ```
 
-### Plug-in API 集成开发
+### Plug-in API Integration Development
 
-如果要添加新的 Plug-in API 代理端点：
+To add new Plug-in API proxy endpoints:
 
-1. 在 `app/services/plugin_api_service.py` 中添加服务方法
-2. 在 `app/api/routes/plugin_api.py` 中添加路由
-3. 在 `app/schemas/plugin_api.py` 中添加相应的 Schema
-4. 更新 API 文档
+1. Add service methods in `app/services/plugin_api_service.py`
+2. Add routes in `app/api/routes/plugin_api.py`
+3. Add corresponding Schemas in `app/schemas/plugin_api.py`
+4. Update API documentation
 
-详细集成说明请参考 [`PLUGIN_API_INTEGRATION.md`](PLUGIN_API_INTEGRATION.md)。
+For detailed integration instructions, refer to [`PLUGIN_API_INTEGRATION.md`](PLUGIN_API_INTEGRATION.md).
 
-### 测试
+### Testing
 
 ```bash
-# 运行测试（如果有的话）
+# Run tests (if available)
 uv run pytest
 
-# 运行特定测试
+# Run specific tests
 uv run pytest tests/test_auth.py
 ```
 
-### 部署
+### Deployment
 
-#### Docker 部署（推荐）
+#### Docker Deployment (Recommended)
 
 ```dockerfile
 FROM python:3.10-slim
@@ -593,90 +593,90 @@ EXPOSE 8008
 CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8008"]
 ```
 
-#### 传统部署
+#### Traditional Deployment
 
 ```bash
-# 安装依赖
+# Install dependencies
 uv sync
 
-# 设置环境变量
+# Set environment variables
 export APP_ENV=production
 
-# 运行数据库迁移
+# Run database migration
 uv run alembic upgrade head
 
-# 启动服务
+# Start service
 uv run uvicorn app.main:app --host 0.0.0.0 --port 8008 --workers 4
 ```
 
-## 故障排除
+## Troubleshooting
 
-### 常见问题
+### Common Issues
 
-1. **数据库连接失败**
-   - 检查 `DATABASE_URL` 配置
-   - 确保 PostgreSQL 服务正在运行
-   - 验证数据库用户权限
+1. **Database Connection Failed**
+   - Check `DATABASE_URL` configuration
+   - Ensure PostgreSQL service is running
+   - Verify database user permissions
 
-2. **Redis 连接失败**
-   - 检查 `REDIS_URL` 配置
-   - 确保 Redis 服务正在运行
-   - 验证 Redis 密码（如果有的话）
+2. **Redis Connection Failed**
+   - Check `REDIS_URL` configuration
+   - Ensure Redis service is running
+   - Verify Redis password (if any)
 
-3. **OAuth 登录失败**
-   - 检查 OAuth 客户端 ID 和密钥
-   - 验证回调 URL 配置
-   - 确保 OAuth 服务器可访问
+3. **OAuth Login Failed**
+   - Check OAuth client ID and secret
+   - Verify callback URL configuration
+   - Ensure OAuth server is accessible
 
-4. **Plug-in API 功能异常**
-   - 检查 `PLUGIN_API_BASE_URL` 配置
-   - 验证管理员密钥和加密密钥
-   - 确保 Plug-in API 服务正在运行
+4. **Plug-in API Functionality Issues**
+   - Check `PLUGIN_API_BASE_URL` configuration
+   - Verify admin key and encryption key
+   - Ensure Plug-in API service is running
 
-5. **Token 刷新失败**
-   - 检查 `refresh_token` 是否过期（默认7天）
-   - 确认 `refresh_token` 未被撤销
-   - 验证 Redis 服务正常运行
+5. **Token Refresh Failed**
+   - Check if `refresh_token` has expired (default 7 days)
+   - Confirm `refresh_token` has not been revoked
+   - Verify Redis service is running normally
 
-### 日志查看
+### Viewing Logs
 
 ```bash
-# 查看应用日志
+# View application logs
 tail -f logs/app.log
 
-# 查看特定级别日志
+# View specific level logs
 grep "ERROR" logs/app.log
 ```
 
-## 许可证
+## License
 
 MIT License
 
-## 贡献
+## Contributing
 
-欢迎提交 Issue 和 Pull Request！
+Welcome to submit Issues and Pull Requests!
 
-### 贡献指南
+### Contribution Guidelines
 
-1. Fork 项目
-2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启 Pull Request
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-### 问题报告
+### Issue Reporting
 
-报告问题时请包含：
+When reporting issues, please include:
 
-- 详细的问题描述
-- 复现步骤
-- 环境信息（操作系统、Python 版本等）
-- 相关的错误日志
+- Detailed problem description
+- Steps to reproduce
+- Environment information (OS, Python version, etc.)
+- Relevant error logs
 
-## 相关文档
+## Related Documentation
 
-- [Plug-in API 集成文档](PLUGIN_API_INTEGRATION.md)
-- [Plug-in API 使用文档](plug-in-API.md)
-- [FastAPI 官方文档](https://fastapi.tiangolo.com/)
-- [SQLAlchemy 文档](https://docs.sqlalchemy.org/)
-- [Alembic 文档](https://alembic.sqlalchemy.org/)
+- [Plug-in API Integration Documentation](PLUGIN_API_INTEGRATION.md)
+- [Plug-in API Usage Documentation](plug-in-API.md)
+- [FastAPI Official Documentation](https://fastapi.tiangolo.com/)
+- [SQLAlchemy Documentation](https://docs.sqlalchemy.org/)
+- [Alembic Documentation](https://alembic.sqlalchemy.org/)

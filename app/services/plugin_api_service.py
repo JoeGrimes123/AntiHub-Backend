@@ -464,6 +464,25 @@ class PluginAPIService:
         is_shared: int = 0
     ) -> Dict[str, Any]:
         """获取OAuth授权URL"""
+        # 检查用户是否有plugin API密钥，如果没有则自动创建
+        api_key = await self.get_user_api_key(user_id)
+        if not api_key:
+            # 自动创建plug-in-api用户并绑定
+            # 获取用户名
+            from app.repositories.user_repository import UserRepository
+            user_repo = UserRepository(self.db)
+            user = await user_repo.get_by_id(user_id)
+            if user:
+                username = user.username
+                # 自动创建并绑定plug-in用户
+                await self.auto_create_and_bind_plugin_user(
+                    user_id=user_id,
+                    username=username,
+                    prefer_shared=is_shared
+                )
+            else:
+                raise ValueError(f"用户 {user_id} 不存在")
+
         return await self.proxy_request(
             user_id=user_id,
             method="POST",
