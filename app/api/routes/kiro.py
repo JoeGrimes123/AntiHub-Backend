@@ -12,7 +12,11 @@ from app.api.deps import get_db_session, get_redis
 from app.api.deps_beta import require_beta_user
 from app.models.user import User
 from app.services.kiro_service import KiroService, UpstreamAPIError
-from app.schemas.kiro import KiroOAuthAuthorizeRequest
+from app.schemas.kiro import (
+    KiroOAuthAuthorizeRequest,
+    KiroAWSBuilderAuthorizeRequest,
+    KiroAWSBuilderCallbackRequest,
+)
 from app.cache import RedisClient
 
 router = APIRouter(prefix="/api/kiro", tags=["Kiro账号管理 (Beta)"])
@@ -104,6 +108,104 @@ async def get_oauth_status(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"获取OAuth授权状态失败: {str(e)}"
+        )
+
+
+# ==================== Kiro AWS Builder ID ====================
+
+@router.post(
+    "/aws-builder/authorize",
+    summary="获取Kiro AWS Builder ID 授权URL",
+    description="获取Kiro账号AWS Builder ID设备授权URL（Beta功能）"
+)
+async def get_aws_builder_authorize_url(
+    request: KiroAWSBuilderAuthorizeRequest,
+    current_user: User = Depends(require_beta_user),
+    service: KiroService = Depends(get_kiro_service)
+):
+    """获取AWS Builder ID设备授权URL"""
+    try:
+        result = await service.get_aws_builder_authorize_url(
+            user_id=current_user.id,
+            is_shared=request.is_shared,
+        )
+        return result
+    except UpstreamAPIError as e:
+        return JSONResponse(
+            status_code=e.status_code,
+            content={
+                "error": e.extracted_message,
+                "type": "api_error"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"获取AWS Builder ID授权URL失败: {str(e)}"
+        )
+
+
+@router.get(
+    "/aws-builder/status/{state}",
+    summary="轮询Kiro AWS Builder ID 授权状态",
+    description="轮询AWS Builder ID 授权状态（Beta功能）"
+)
+async def get_aws_builder_status(
+    state: str,
+    current_user: User = Depends(require_beta_user),
+    service: KiroService = Depends(get_kiro_service)
+):
+    """轮询AWS Builder ID授权状态"""
+    try:
+        result = await service.get_aws_builder_status(
+            user_id=current_user.id,
+            state=state,
+        )
+        return result
+    except UpstreamAPIError as e:
+        return JSONResponse(
+            status_code=e.status_code,
+            content={
+                "error": e.extracted_message,
+                "type": "api_error"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"获取AWS Builder ID授权状态失败: {str(e)}"
+        )
+
+
+@router.post(
+    "/aws-builder/callback",
+    summary="完成Kiro AWS Builder ID 登录",
+    description="触发服务端轮询token并创建Kiro账号（Beta功能）"
+)
+async def aws_builder_callback(
+    request: KiroAWSBuilderCallbackRequest,
+    current_user: User = Depends(require_beta_user),
+    service: KiroService = Depends(get_kiro_service)
+):
+    """完成AWS Builder ID登录"""
+    try:
+        result = await service.aws_builder_callback(
+            user_id=current_user.id,
+            state=request.state,
+        )
+        return result
+    except UpstreamAPIError as e:
+        return JSONResponse(
+            status_code=e.status_code,
+            content={
+                "error": e.extracted_message,
+                "type": "api_error"
+            }
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"AWS Builder ID登录失败: {str(e)}"
         )
 
 

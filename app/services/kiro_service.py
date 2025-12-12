@@ -305,6 +305,36 @@ class KiroService:
             method="GET",
             path=f"/api/kiro/oauth/status/{state}"
         )
+
+    async def get_aws_builder_authorize_url(self, user_id: int, is_shared: int = 0) -> Dict[str, Any]:
+        """获取AWS Builder ID 授权URL（通过插件API）"""
+        return await self._proxy_request(
+            user_id=user_id,
+            method="POST",
+            path="/api/kiro/aws-builder/authorize",
+            json_data={
+                "is_shared": is_shared
+            }
+        )
+
+    async def get_aws_builder_status(self, user_id: int, state: str) -> Dict[str, Any]:
+        """轮询AWS Builder ID 授权状态（通过插件API）"""
+        return await self._proxy_request(
+            user_id=user_id,
+            method="GET",
+            path=f"/api/kiro/aws-builder/status/{state}"
+        )
+
+    async def aws_builder_callback(self, user_id: int, state: str) -> Dict[str, Any]:
+        """完成AWS Builder ID 登录（通过插件API轮询token并创建账号）"""
+        return await self._proxy_request(
+            user_id=user_id,
+            method="POST",
+            path="/api/kiro/aws-builder/callback",
+            json_data={
+                "state": state
+            }
+        )
     
     async def create_account(self, user_id: int, account_data: Dict[str, Any]) -> Dict[str, Any]:
         """创建Kiro账号（通过插件API）"""

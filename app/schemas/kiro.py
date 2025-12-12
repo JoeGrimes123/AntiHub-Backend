@@ -14,6 +14,16 @@ class KiroOAuthAuthorizeRequest(BaseModel):
     is_shared: int = Field(0, description="0=专属cookie，1=共享cookie")
 
 
+class KiroAWSBuilderAuthorizeRequest(BaseModel):
+    """获取Kiro AWS Builder ID 授权URL请求"""
+    is_shared: int = Field(0, description="0=专属cookie，1=共享cookie")
+
+
+class KiroAWSBuilderCallbackRequest(BaseModel):
+    """完成 Kiro AWS Builder ID 登录（轮询并创建账号）"""
+    state: str = Field(..., description="authorize接口返回的state")
+
+
 class KiroAccountCreate(BaseModel):
     """创建Kiro账号请求"""
     account_name: str = Field(..., description="账号名称")
